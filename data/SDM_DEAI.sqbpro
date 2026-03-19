@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="C:/Users/bramp/Documents/HBO-ICT-VT/SDM_DEAI.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2959"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="Accessoire_Inkoop" custom_title="0" dock_id="1" table="4,17:mainAccessoire_Inkoop"/><dock_state state="000000ff00000000fd00000001000000020000000000000000fc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000011800ffffff000000000000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1*">-- SQLite instelling: Zet Foreign Keys aan
+PRAGMA foreign_keys = ON;
+
+-- ==========================================
+-- 1. BikeToDrive_RIM - Accessoire-inkoop
+-- ==========================================
+
+CREATE TABLE Accessoire_Inkoop_Leverancier (
+	leveranciernr INTEGER,
+	naam VARCHAR(45),
+	adres VARCHAR(100),
+	woonplaats VARCHAR(45),
+
+	PRIMARY KEY(leveranciernr)
+);
+
+CREATE TABLE Accessoire_Inkoop_Accessoire (
+	accessoirenr INTEGER,
+	naam VARCHAR(45),
+	standaardprijs FLOAT,
+	inkoopprijs FLOAT,
+	soort VARCHAR(45),
+	leverancier INTEGER NOT NULL,
+
+	PRIMARY KEY(accessoirenr),
+	FOREIGN KEY(leverancier) REFERENCES Accessoire_Inkoop_Leverancier(leveranciernr)
+);
+
+CREATE TABLE Accessoire_Inkoop (
+	inkoopnr INTEGER,
+	inkoopmaand INTEGER,
+	inkoopjaar INTEGER,
+	aantal INTEGER,
+	accessoire INTEGER NOT NULL,
+
+	PRIMARY KEY(inkoopnr),
+	FOREIGN KEY(accessoire) REFERENCES Accessoire_Inkoop_Accessoire(accessoirenr)
+);
+
+
+-- ==========================================
+-- 2. BikeToDrive_RIM - Fietsinkoop
+-- ==========================================
+
+CREATE TABLE Fiets_Inkoop_Fabrikant (
+	fabrikantnr INTEGER,
+	naam VARCHAR(45),
+	adres VARCHAR(100),
+	plaats VARCHAR(45),
+
+	PRIMARY KEY(fabrikantnr)
+);
+
+CREATE TABLE Fiets_Inkoop_Fiets (
+	fietsnr INTEGER,
+	soort VARCHAR(45),
+	merk VARCHAR(45),
+	type VARCHAR(45),
+	standaardprijs FLOAT,
+	inkoopprijs FLOAT,
+	kleur VARCHAR(20),
+	fabrikant INTEGER NOT NULL,
+
+	PRIMARY KEY(fietsnr),
+	FOREIGN KEY(fabrikant) REFERENCES Fiets_Inkoop_Fabrikant(fabrikantnr)
+);
+
+CREATE TABLE Fiets_Inkoop (
+	inkoopnr INTEGER,
+	inkoopmaand INTEGER,
+	inkoopjaar INTEGER,
+	aantal INTEGER,
+	fiets INTEGER NOT NULL,
+
+	PRIMARY KEY(inkoopnr),
+	FOREIGN KEY(fiets) REFERENCES Fiets_Inkoop_Fiets(fietsnr)
+);
+
+
+-- ==========================================
+-- 3. BikeToDrive_RIM - Onderhoud
+-- ==========================================
+
+CREATE TABLE Onderhoud_Fabrikant (
+	fabrikantnr INTEGER,
+	naam VARCHAR(45),
+	adres VARCHAR(100),
+	plaats VARCHAR(45),
+
+	PRIMARY KEY(fabrikantnr)
+);
+
+CREATE TABLE Onderhoud_Fiets (
+	fietsnr INTEGER,
+	soort VARCHAR(45),
+	merk VARCHAR(45),
+	type VARCHAR(45),
+	standaardprijs FLOAT,
+	inkoopprijs FLOAT,
+	kleur VARCHAR(20),
+	fabrikant INTEGER NOT NULL,
+
+	PRIMARY KEY(fietsnr),
+	FOREIGN KEY(fabrikant) REFERENCES Onderhoud_Fabrikant(fabrikantnr)
+);
+
+CREATE TABLE Onderhoud_Filiaal (
+	filiaalnr INTEGER,
+	naam VARCHAR(45),
+	adres VARCHAR(100),
+	provincie VARCHAR(20),
+
+	PRIMARY KEY(filiaalnr)
+);
+
+CREATE TABLE Onderhoud_Monteur (
+	monteurnr INTEGER,
+	naam VARCHAR(45),
+	woonplaats VARCHAR(45),
+	uurloon FLOAT,
+	filiaal INTEGER NOT NULL,
+
+	PRIMARY KEY(monteurnr),
+	FOREIGN KEY(filiaal) REFERENCES Onderhoud_Filiaal(filiaalnr)
+);
+
+CREATE TABLE Onderhoud (
+	onderhoudnr INTEGER,
+	datum DATE,
+	starttijd TIME,
+	eindtijd TIME,
+	fiets INTEGER NOT NULL,
+	monteur INTEGER NOT NULL,
+
+	PRIMARY KEY(onderhoudnr),
+	FOREIGN KEY(fiets) REFERENCES Onderhoud_Fiets(fietsnr),
+	FOREIGN KEY(monteur) REFERENCES Onderhoud_Monteur(monteurnr)
+);
+
+
+-- ==========================================
+-- 4. BikeToDrive_RIM - Fietsverkoop
+-- ==========================================
+
+CREATE TABLE Fietsverkoop_Filiaal (
+    filiaalnr INTEGER,
+    naam TEXT,
+    adres TEXT,
+    provincie TEXT,
+
+    PRIMARY KEY(filiaalnr)
+);
+
+CREATE TABLE Fietsverkoop_Fabrikant (
+    fabrikantnr INTEGER,
+    naam TEXT,
+    adres TEXT,
+    plaats TEXT,
+
+    PRIMARY KEY(fabrikantnr)
+);
+
+CREATE TABLE Fietsverkoop_Monteur (
+    monteurnr INTEGER,
+    naam TEXT,
+    woonplaats TEXT,
+    uurloon REAL,
+    filiaal INTEGER NOT NULL,
+
+    PRIMARY KEY(monteurnr),
+    FOREIGN KEY(filiaal) REFERENCES Fietsverkoop_Filiaal(filiaalnr)
+);
+
+CREATE TABLE Fietsverkoop_Klant (
+    klantnr INTEGER,
+    naam TEXT,
+    adres TEXT,
+    woonplaats TEXT,
+    geslacht CHAR(1),
+    geboortedatum VARCHAR(10),
+
+    PRIMARY KEY(klantnr)
+);
+
+CREATE TABLE Fietsverkoop_Fiets (
+    fietsnr INTEGER,
+    soort TEXT,
+    merk TEXT,
+    type TEXT,
+    standaardprijs REAL,
+    inkoopprijs REAL,
+    kleur TEXT,
+    fabrikant INTEGER NOT NULL,
+
+    PRIMARY KEY(fietsnr),
+    FOREIGN KEY(fabrikant) REFERENCES Fietsverkoop_Fabrikant(fabrikantnr)
+);
+
+CREATE TABLE Fietsverkoop_Fiets_Verkoop (
+    fiets_verkoopnr INTEGER,
+    datum VARCHAR(10),
+    aantal INTEGER,
+    verkoopprijs REAL,
+    klant INTEGER NOT NULL,
+    fiets INTEGER NOT NULL,
+    monteur INTEGER NOT NULL,
+
+    PRIMARY KEY(fiets_verkoopnr),
+    FOREIGN KEY(klant) REFERENCES Fietsverkoop_Klant(klantnr),
+    FOREIGN KEY(fiets) REFERENCES Fietsverkoop_Fiets(fietsnr),
+    FOREIGN KEY(monteur) REFERENCES Fietsverkoop_Monteur(monteurnr)
+);
+
+
+-- ==========================================
+-- 5. BikeToDrive_RIM - Accessoireverkoop
+-- ==========================================
+
+CREATE TABLE Accessoireverkoop_Filiaal (
+    filiaalnr INTEGER,
+    naam TEXT,
+    adres TEXT,
+    provincie TEXT,
+
+    PRIMARY KEY(filiaalnr)
+);
+
+CREATE TABLE Accessoireverkoop_Leverancier (
+    leveranciernr INTEGER,
+    naam TEXT,
+    adres TEXT,
+    woonplaats TEXT,
+
+    PRIMARY KEY(leveranciernr)
+);
+
+CREATE TABLE Accessoireverkoop_Monteur (
+    monteurnr INTEGER,
+    naam TEXT,
+    woonplaats TEXT,
+    uurloon REAL,
+    filiaal INTEGER NOT NULL,
+
+    PRIMARY KEY(monteurnr),
+    FOREIGN KEY(filiaal) REFERENCES Accessoireverkoop_Filiaal(filiaalnr)
+);
+
+CREATE TABLE Accessoireverkoop_Klant (
+    klantnr INTEGER,
+    naam TEXT,
+    adres TEXT,
+    woonplaats TEXT,
+    geslacht CHAR(1),
+    geboortedatum VARCHAR(10),
+
+    PRIMARY KEY(klantnr)
+);
+
+CREATE TABLE Accessoireverkoop_Accessoire (
+    accessoirenr INTEGER,
+    naam TEXT,
+    standaardprijs REAL,
+    inkoopprijs REAL,
+    soort TEXT,
+    leverancier INTEGER NOT NULL,
+
+    PRIMARY KEY(accessoirenr),
+    FOREIGN KEY(leverancier) REFERENCES Accessoireverkoop_Leverancier(leveranciernr)
+);
+
+CREATE TABLE Accessoireverkoop_Accessoire_Verkoop (
+    accessoire_verkoopnr INTEGER,
+    datum VARCHAR(10),
+    aantal INTEGER,
+    verkoopprijs REAL,
+    klant INTEGER NOT NULL,
+    accessoire INTEGER NOT NULL,
+    monteur INTEGER NOT NULL,
+
+    PRIMARY KEY(accessoire_verkoopnr),
+    FOREIGN KEY(klant) REFERENCES Accessoireverkoop_Klant(klantnr),
+    FOREIGN KEY(accessoire) REFERENCES Accessoireverkoop_Accessoire(accessoirenr),
+    FOREIGN KEY(monteur) REFERENCES Accessoireverkoop_Monteur(monteurnr)
+);</sql><current_tab id="0"/></tab_sql></sqlb_project>
