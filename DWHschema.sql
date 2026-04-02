@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS FACT_Inkoop (
 CREATE TABLE IF NOT EXISTS FACT_Onderhoud (
     onderhoud_id    INTEGER PRIMARY KEY AUTOINCREMENT,
     medewerkerID    INTEGER NOT NULL REFERENCES DIM_Medewerker(monteurID),
-    klantnr         INTEGER NOT NULL REFERENCES DIM_Klant(klantnr),
+    klantnr         INTEGER          REFERENCES DIM_Klant(klantnr),  -- nullable: pre-sale maintenance has no customer yet
     datum           TEXT    NOT NULL REFERENCES DIM_Tijd(datum),
     begintijd       TEXT    NOT NULL,
     eindtijd        TEXT    NOT NULL
