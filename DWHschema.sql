@@ -5,12 +5,7 @@
 
 PRAGMA foreign_keys = ON;
 
--- =============================================================
---  DIMENSION TABLES
--- =============================================================
-
 -- DIM_Tijd (Time dimension)
--- Natural key: datum (ISO date string YYYY-MM-DD)
 CREATE TABLE IF NOT EXISTS DIM_Tijd (
     datum       TEXT    NOT NULL,
     dag         INTEGER NOT NULL,
@@ -21,9 +16,7 @@ CREATE TABLE IF NOT EXISTS DIM_Tijd (
     PRIMARY KEY (datum)
 );
 
--- DIM_Product
--- Surrogate key: productnr (auto-increment)
--- Source: FIETS UNION ACCESSOIRE
+-- DIM_Product (Bron: Fiets UNION Accessoire)
 CREATE TABLE IF NOT EXISTS DIM_Product (
     productnr       INTEGER PRIMARY KEY AUTOINCREMENT,
     type            TEXT    NOT NULL,
@@ -33,24 +26,28 @@ CREATE TABLE IF NOT EXISTS DIM_Product (
     inkoopprijs     REAL    NOT NULL,
     prijsklasse     TEXT    NOT NULL CHECK (prijsklasse IN ('Low', 'Mid', 'High')),
     kleur           TEXT,
-    merk            TEXT
+    merk            TEXT,
+    geldig_van      TEXT    NOT NULL DEFAULT '1900-01-01',
+    geldig_tot      TEXT    NOT NULL DEFAULT '9999-12-31',
+    is_actief       INTEGER NOT NULL DEFAULT 1
 );
 
--- DIM_Klant (Customer dimension)
--- Natural key: klantnr (kept from source)
+-- DIM_Klant (SCD Type 2)
 CREATE TABLE IF NOT EXISTS DIM_Klant (
-    klantnr             INTEGER PRIMARY KEY,
+    surrogate_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    klantnr             INTEGER NOT NULL,
     naam                TEXT    NOT NULL,
     adres               TEXT,
     woonplaats          TEXT,
     geslacht            TEXT,
     geboortedatum       TEXT,
-    leeftijdscategorie  TEXT
+    leeftijdscategorie  TEXT,
+    geldig_van          TEXT    NOT NULL DEFAULT '1900-01-01',
+    geldig_tot          TEXT    NOT NULL DEFAULT '9999-12-31',
+    is_actief           INTEGER NOT NULL DEFAULT 1
 );
 
--- DIM_Partner
--- Surrogate key: partnernr (auto-increment)
--- Source: LEVERANCIER UNION FABRIKANT
+-- DIM_Partner (Bron: Leverancier UNION Fabrikant)
 CREATE TABLE IF NOT EXISTS DIM_Partner (
     partnernr   INTEGER PRIMARY KEY AUTOINCREMENT,
     naam        TEXT    NOT NULL,
@@ -58,9 +55,7 @@ CREATE TABLE IF NOT EXISTS DIM_Partner (
     locatie     TEXT
 );
 
--- DIM_Medewerker (Employee / Mechanic dimension)
--- Natural key: monteurID (kept from source)
--- Geographic hierarchy denormalised: filiaal -> regio -> provincie
+-- DIM_Medewerker (Bron: Monteur + Filiaal)
 CREATE TABLE IF NOT EXISTS DIM_Medewerker (
     monteurID   INTEGER PRIMARY KEY,
     naam        TEXT    NOT NULL,
@@ -71,17 +66,11 @@ CREATE TABLE IF NOT EXISTS DIM_Medewerker (
     provincie   TEXT
 );
 
--- =============================================================
---  FACT TABLES
--- =============================================================
-
--- FACT_Verkoop (Sales fact)
--- Grain: one row per sale transaction line
--- Measures: aantal, verkoopprijs, omzet (= aantal x verkoopprijs)
+-- FACT_Verkoop 
 CREATE TABLE IF NOT EXISTS FACT_Verkoop (
     verkoop_id      INTEGER PRIMARY KEY AUTOINCREMENT,
     productnr       INTEGER NOT NULL REFERENCES DIM_Product(productnr),
-    klantnr         INTEGER NOT NULL REFERENCES DIM_Klant(klantnr),
+    klantnr         INTEGER NOT NULL REFERENCES DIM_Klant(surrogate_id),
     medewerkerID    INTEGER NOT NULL REFERENCES DIM_Medewerker(monteurID),
     datum           TEXT    NOT NULL REFERENCES DIM_Tijd(datum),
     aantal          INTEGER NOT NULL,
@@ -89,9 +78,7 @@ CREATE TABLE IF NOT EXISTS FACT_Verkoop (
     omzet           REAL    NOT NULL
 );
 
--- FACT_Inkoop (Purchase fact)
--- Grain: one row per purchase transaction line
--- Measures: aantal, inkoopwaarde
+-- FACT_Inkoop
 CREATE TABLE IF NOT EXISTS FACT_Inkoop (
     inkoop_id       INTEGER PRIMARY KEY AUTOINCREMENT,
     productnr       INTEGER NOT NULL REFERENCES DIM_Product(productnr),
@@ -101,35 +88,22 @@ CREATE TABLE IF NOT EXISTS FACT_Inkoop (
     inkoopwaarde    REAL    NOT NULL
 );
 
--- FACT_Onderhoud (Maintenance fact)
--- Grain: one row per maintenance appointment
--- Measures: begintijd, eindtijd (duur can be derived)
+-- FACT_Onderhoud
 CREATE TABLE IF NOT EXISTS FACT_Onderhoud (
     onderhoud_id    INTEGER PRIMARY KEY AUTOINCREMENT,
     medewerkerID    INTEGER NOT NULL REFERENCES DIM_Medewerker(monteurID),
-    klantnr         INTEGER          REFERENCES DIM_Klant(klantnr),  -- nullable: pre-sale maintenance has no customer yet
+    klantnr         INTEGER          REFERENCES DIM_Klant(surrogate_id), 
     datum           TEXT    NOT NULL REFERENCES DIM_Tijd(datum),
     begintijd       TEXT    NOT NULL,
     eindtijd        TEXT    NOT NULL
 );
 
--- =============================================================
---  INDEXES
--- =============================================================
-
-CREATE INDEX IF NOT EXISTS IDX_Verkoop_Product  ON FACT_Verkoop(productnr);
-CREATE INDEX IF NOT EXISTS IDX_Verkoop_Klant    ON FACT_Verkoop(klantnr);
-CREATE INDEX IF NOT EXISTS IDX_Verkoop_Medew    ON FACT_Verkoop(medewerkerID);
-CREATE INDEX IF NOT EXISTS IDX_Verkoop_Datum    ON FACT_Verkoop(datum);
-
-CREATE INDEX IF NOT EXISTS IDX_Inkoop_Product   ON FACT_Inkoop(productnr);
-CREATE INDEX IF NOT EXISTS IDX_Inkoop_Partner   ON FACT_Inkoop(partnernr);
-CREATE INDEX IF NOT EXISTS IDX_Inkoop_Datum     ON FACT_Inkoop(datum);
-
-CREATE INDEX IF NOT EXISTS IDX_Onderhoud_Medew  ON FACT_Onderhoud(medewerkerID);
-CREATE INDEX IF NOT EXISTS IDX_Onderhoud_Klant  ON FACT_Onderhoud(klantnr);
-CREATE INDEX IF NOT EXISTS IDX_Onderhoud_Datum  ON FACT_Onderhoud(datum);
-
--- =============================================================
---  END OF SCRIPT
--- =============================================================
+-- KeyMapping Table (Onthoudt welke bron-ID bij welke DWH-ID hoort)
+CREATE TABLE IF NOT EXISTS DWH_KeyMapping (
+    mapping_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    dwh_table       TEXT    NOT NULL,
+    source_table    TEXT    NOT NULL,
+    source_key      INTEGER NOT NULL,
+    dwh_surrogate   INTEGER NOT NULL,
+    UNIQUE (dwh_table, source_table, source_key)
+);
