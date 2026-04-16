@@ -1,0 +1,63 @@
+Model 1
+Gekozen features: Gr Liv Area (Numeriek), Overall Qual (Numeriek), Neighborhood (Categorisch).
+Aantal clusters: 5
+Hyperparameter via 'help()': n_init=20
+Preprocessing: StandardScaler toegepast en Neighborhood ge-one-hot-encoded.
+
+Resultaat k=5:
+Inertia: 74581.26
+Silhouette Score: 0.1281
+
+Model 2
+Gekozen features: Year Built(num), Full Bath(num), House Style(cat)
+Aantal Clusters: 4
+Hyperparameter: init=random
+
+Resultaat:
+Inertia: 16969.99
+Silhouette Score: 0.5105
+
+Model 3:
+Gekozen features: Lot area(num), Total Bsmt SF(num), Garage(cat)
+Aantal Clusters: 3
+Hyperparameter: init=random
+
+Resultaat:
+Inertia: 4055.41
+Silhouette Score: 0.4884
+
+Model 4:
+Gekozen features: Full Bath(num), Bedroom AbvGr(num), House Style(cat)
+Aantal Clusters: 4
+Hyperparameter: max_iter=500
+
+Resultaat:
+Inertia: 17923.58
+Silhouette Score: 0.4312
+
+Model 5:
+Gekozen features: SalePrice(num), Overall Qual(num), Garage(cat)
+Aantal Clusters: 4
+Hyperparameter: algorithm:elkan
+
+Resultaat:
+Inertia: 1556.23
+Silhouette Score: 0.4971
+
+Model 6:
+Gekozen features: Full bath(num), Bedroom AbvGr(num)
+Aantal Clusters: 4
+Hyperparameter: algorithm=elkan
+
+Resultaat:
+Inertia: 1137.78
+Silhouette Score: 0.7363
+
+Model 7(De 2 features hebben wenig variatie, daardoor is de Silhouette score bijna perfect):
+Gekozen features: Full Bath(num), Garage(cat)
+Aantal clusters: 5
+Hyperparameter: init+k-means++
+
+Resultaat:
+Inertia: 63.26
+Silhouette Score: 0.9901
