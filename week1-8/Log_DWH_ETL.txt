@@ -1,0 +1,6 @@
+DatumTijd|Status|Tabel|Melding
+2026-04-16 13:43:25|INFO|Systeem|Start laden van Fact tabellen...
+2026-04-16 13:43:25|SUCCESS|FACT_Verkoop|0 Fietsen ingevoegd, 0 Accessoires ingevoegd
+2026-04-16 13:43:25|SUCCESS|FACT_Inkoop|100 Fietsen ingevoegd, 50 Accessoires ingevoegd
+2026-04-16 13:43:25|SUCCESS|FACT_Onderhoud|0 onderhoudsbeurten ingevoegd
+2026-04-16 13:43:25|SUCCESS|Systeem|ETL volledig afgerond en connecties gesloten.

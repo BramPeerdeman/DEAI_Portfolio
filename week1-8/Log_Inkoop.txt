@@ -1,5 +1,5 @@
 DatumTijd|Status|Tabel|Melding
-2026-04-08 14:35:51|INFO|Start|Start laden Accessoire-inkoop
-2026-04-08 14:35:51|SUCCESS|Leverancier|Data succesvol geladen
-2026-04-08 14:35:51|SUCCESS|Accessoire|Data succesvol geladen
-2026-04-08 14:35:51|ERROR|Accessoire_Inkoop|Rij 42 overgeslagen: Data type mismatch
+2026-04-16 13:41:05|INFO|Start|Start laden Accessoire-inkoop
+2026-04-16 13:41:05|SUCCESS|Leverancier|Data succesvol geladen
+2026-04-16 13:41:05|SUCCESS|Accessoire|Data succesvol geladen
+2026-04-16 13:41:05|ERROR|Accessoire_Inkoop|Rij 42 overgeslagen: Data type mismatch
