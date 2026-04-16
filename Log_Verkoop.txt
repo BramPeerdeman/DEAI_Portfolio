@@ -1,5 +1,5 @@
 DatumTijd|Status|Tabel|Melding
-2026-03-26 14:14:29|INFO|Start|Start laden Fietsverkoop
-2026-03-26 14:14:29|SUCCESS|Filiaal|Data succesvol geladen
-2026-03-26 14:14:29|SUCCESS|Klant|Data succesvol geladen
-2026-03-26 14:14:29|ERROR|Fietsverkoop_Fiets|Connectie time-out tijdens laden van 5 rijen
+2026-04-08 14:35:51|INFO|Start|Start laden Fietsverkoop
+2026-04-08 14:35:51|SUCCESS|Filiaal|Data succesvol geladen
+2026-04-08 14:35:51|SUCCESS|Klant|Data succesvol geladen
+2026-04-08 14:35:51|ERROR|Fietsverkoop_Fiets|Connectie time-out tijdens laden van 5 rijen
